@@ -8,6 +8,22 @@ plt.rcParams["font.sans-serif"] = ["SimHei"]  # 设置字体
 
 # 读取SPSS格式数据
 
+def 绘制单个类别变量柱状图(数据表,变量:str):
+# 绘制单个类别变量柱状图
+ x = 数据表['变量'].value_counts().index
+ y = 数据表['变量'].value_counts(normalize=True).values * 100
+# 创建图
+ fig, ax = plt.subplots()
+# 绘制柱状图
+ rects1 = ax.bar(x, y)
+# 设置x轴变量名称
+ ax.set_xlabel('变量')
+# 设置y轴最大值
+ ax.set_ylim(ymax=100)
+# 在柱上方显示对应的值
+ ax.bar_label(rects1, fmt="%.1f", padding=3)
+# 显示图形
+
 
 def 读取SPSS数据(文件所在位置及名称):
     """ 读取SPSS文件，保留标签内容和有序变量顺序 """
@@ -23,7 +39,6 @@ def 有序变量描述统计函数(表名, 变量名):
     描述统计表['比例'] = 描述统计表['count'] / 描述统计表['count'].sum()
     描述统计表['累计比例'] = 描述统计表['比例'].cumsum()
     return 描述统计表
-
 
 def 数值变量描述统计1(数据表, 变量名):
     result = 数据表[变量名].describe()
@@ -80,3 +95,26 @@ def 相关系数强弱判断(相关系数值):
 
 def 制作交叉表(数据表, 自变量, 因变量):
     return pd.crosstab(数据表[自变量], 数据表[因变量], normalize='columns', margins=True)
+
+
+import pandas as pd  
+import numpy as np  
+from scipy import stats  
+  
+def 计算单变量均值的置信区间(数据表路径及文件名,变量名,置信水平=0.95):  
+# 打开数据文件  
+  file_path = 数据表路径及文件名  
+  df = pd.read_csv(file_path)  
+# 计算均值和标准误差  
+  mean = df[变量名].mean()  
+  std_error = stats.sem(df[变量名])  
+# 设定置信水平  
+  confidence_level = 置信水平  
+# 设定自由度  
+  自由度 = len(df[变量名])-1 
+# 计算置信区间  
+  confidence_interval = stats.t.interval(confidence_level, 自由度, loc=mean, scale=std_error)  
+# 输出结果  
+  print(F"均值：{mean: .2f}")  
+  print(F"均值在置信水平{confidence_level}下的置信区间为：", confidence_interval)  
+  return mean,confidence_interval
